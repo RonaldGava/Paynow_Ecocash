@@ -4,28 +4,25 @@ const { Paynow } = require('paynow');
 const app = express();
 const port = 3000;
 
-// ✅ Cag Tours Pvt Ltd credentials
+// ✅ CAG Tours Pvt Ltd Paynow credentials
 const paynow = new Paynow(
-  '20625', // Integration ID
-  'f6559511-ab13-45b0-b75b-07b36890f6a6' // Integration Key
+  '20625', // CAG Integration ID
+  'f6559511-ab13-45b0-b75b-07b36890f6a6' // CAG Integration Key
 );
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-/**
- * 🌐 GET /paynow/initiate?phone=077xxxxxxx&amount=5
- */
 app.get('/paynow/initiate', async (req, res) => {
   const phone = req.query.phone;
-  const amount = parseFloat(req.query.amount || '0');
 
-  if (!phone || !amount) {
-    return res.status(400).send('⚠️ Please provide ?phone=077xxxxxxx&amount=5');
+  if (!phone) {
+    return res.status(400).send('⚠️ Phone number required in ?phone=0771234567');
   }
 
-  const payment = paynow.createPayment('INV-' + Date.now(), 'ronaldgava8@gmail.com');
-  payment.add('Voiceflow EcoCash Payment', amount);
+  // 📦 Payment setup
+  const payment = paynow.createPayment('INV-' + Date.now(), 'ronaldgava8@gmail.com'); // Optional: Change to CAG Tours email
+  payment.add('CAG EcoCash Payment', 5.00); // You can make amount dynamic if needed
 
   try {
     const response = await paynow.sendMobile(payment, phone, 'ecocash');
@@ -37,15 +34,15 @@ app.get('/paynow/initiate', async (req, res) => {
         pollUrl: response.pollUrl
       });
     } else {
-      console.log('❌ Payment failed:', response);
+      console.log('❌ Failed to initiate EcoCash:', response);
       return res.status(400).json({ error: response.error });
     }
   } catch (err) {
-    console.error('💥 Server error:', err.message);
-    return res.status(500).send('Internal server error');
+    console.error('💥 Error initiating payment:', err.message);
+    return res.status(500).send('Server error');
   }
 });
 
 app.listen(port, () => {
-  console.log(`🚀 Server is running on port ${port}`);
+  console.log(`🚀 CAG Paynow Server running on port ${port}`);
 });
