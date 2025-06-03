@@ -13,16 +13,19 @@ const paynow = new Paynow(
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.get('/paynow/initiate', async (req, res) => {
-  const phone = req.query.phone;
+/**
+ * 🔐 POST /paynow/initiate
+ * Body: { "phone": "0771234567", "amount": 5 }
+ */
+app.post('/paynow/initiate', async (req, res) => {
+  const { phone, amount } = req.body;
 
-  if (!phone) {
-    return res.status(400).send('⚠️ Phone number is required in ?phone=0771234567');
+  if (!phone || !amount) {
+    return res.status(400).json({ error: 'Phone and amount are required.' });
   }
 
-  // 👇 Email is left empty or generic if required, adjust later if needed
-  const payment = paynow.createPayment('INV-' + Date.now(), '');
-  payment.add('Voiceflow EcoCash Payment', 5.00);
+  const payment = paynow.createPayment('INV-' + Date.now(), 'ronaldgava8@gmail.com');
+  payment.add('Cag Tours EcoCash Payment', parseFloat(amount));
 
   try {
     const response = await paynow.sendMobile(payment, phone, 'ecocash');
@@ -30,7 +33,7 @@ app.get('/paynow/initiate', async (req, res) => {
     if (response.success) {
       console.log('✅ EcoCash Payment initiated for', phone);
       return res.status(200).json({
-        message: 'EcoCash payment initiated. Check your phone!',
+        message: 'EcoCash payment initiated. Please check your phone!',
         pollUrl: response.pollUrl
       });
     } else {
@@ -44,5 +47,5 @@ app.get('/paynow/initiate', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
+  console.log(`🚀 Cag Tours server running on port ${port}`);
 });
