@@ -4,9 +4,10 @@ const { Paynow } = require('paynow');
 const app = express();
 const port = 3000;
 
+// ✅ Cag Tours Pvt Ltd credentials
 const paynow = new Paynow(
-  '21035', // Ronald Gava Integration ID
-  '66703c08-699a-4810-a259-0ba6342362d3' // Ronald Gava Key
+  '20625', // Integration ID
+  'f6559511-ab13-45b0-b75b-07b36890f6a6' // Integration Key
 );
 
 app.use(express.urlencoded({ extended: true }));
@@ -16,10 +17,11 @@ app.get('/paynow/initiate', async (req, res) => {
   const phone = req.query.phone;
 
   if (!phone) {
-    return res.status(400).send('⚠️ Phone number required in ?phone=0771234567');
+    return res.status(400).send('⚠️ Phone number is required in ?phone=0771234567');
   }
 
-  const payment = paynow.createPayment('INV-' + Date.now(), 'ronaldgava8@gmail.com');
+  // 👇 Email is left empty or generic if required, adjust later if needed
+  const payment = paynow.createPayment('INV-' + Date.now(), '');
   payment.add('Voiceflow EcoCash Payment', 5.00);
 
   try {
